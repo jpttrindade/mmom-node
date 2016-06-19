@@ -1,27 +1,31 @@
-var Message = require('./Message');
+var Message = require('../common/Message');
 var Buffer =  require('buffer').Buffer;
 
 
 function MessageEncoder() {}
 
 
-
 // type.(requestIdSize.requestId)+.(mimetypeSize.mimetype)+.(content)
 MessageEncoder.encode = function (message) {
 	var bufferSize = getBufferSize(message);
 	var buffer = new Buffer(bufferSize);
-
-	index = writeType(message.head.type, buffer, 0);
+	
+	index = writeCode(message.head.code, buffer, 0);
 	index = writeRequestId(message.head.requestId, buffer, index);
+	index = writeDestinationId(message.head.destinationId, buffer, index);
+	index = writeType(message.head.type, buffer, index);
 	index = writeFileName(message.body.fileName, buffer, index);
 
-	switch(message.head.type) {
-		case 0:
-		case 1:
+	if (message.head.code === 1) {
+		index = writeTextContent(message.body.content, buffer, index);
+	}
+
+	if (message.head.code === 2){
+		if (message.head.type === 1){
 			index = writeTextContent(message.body.content, buffer, index);
-		    break;
-		case 2:
+		} else {
 			index = writeFileContent(message.body.content, buffer, index);
+		}
 
 	}
 	return buffer;
@@ -30,30 +34,46 @@ MessageEncoder.encode = function (message) {
 MessageEncoder.decode = function (buffer) {
 	var message = new Message();
 	var index = 0;
-	index = readType(message, buffer, index);
+	index = readCode(message, buffer, index);
 	index = readRequestId(message, buffer, index);
+	index = readDestinationId(message, buffer, index);
+	index = readType(message, buffer, index);
 	index = readFileName(message, buffer, index);
-	switch(message.head.type) {
-		case 0:
-		case 1:
-			index = readTextContent(message, buffer, index);
-			break;
-		case 2:
-			index = readFileContent(message, buffer, index);
-			break;
+	console.log('message: ', message);
+
+	if (message.head.code === 1){
+		index = readTextContent(message, buffer, index);
 	}
+
+	if (message.head.code === 2){
+		if(message.head.type === 1) {
+			index = readTextContent(message, buffer, index);
+		} else {
+			index = readFileContent(message, buffer, index);
+		}
+	} 	
+
 	return message;
 }
 
-function readType (message, buffer, index) {
-	type = buffer[index];
-	message.setType(type);
+function readCode (message, buffer, index) {
+	code = buffer[index];
+	message.setCode(code);
 	index++;
 	return index;
 }
 
+function readType (message, buffer, index) {
+	if(message.head.code==2){
+		type = buffer[index];
+		message.setType(type);
+		index++;
+	}
+	return index;
+}
+
 function readRequestId (message, buffer, index) {
-	if (message.head.type > 0) {
+	if (message.head.code > 0) {
 		requestIdSize = buffer[index];
 		index++;
 		requestId = buffer.toString('utf8', index, index+requestIdSize);
@@ -63,8 +83,19 @@ function readRequestId (message, buffer, index) {
 	return index;
 }
 
+function readDestinationId (message, buffer, index) {
+	if (message.head.code > 0) {
+		destinationIdSize = buffer[index];
+		index++;
+		destinationId = buffer.toString('utf8', index, index+destinationIdSize);
+		message.setDestinationId(destinationId);
+		index += destinationIdSize;
+	}
+	return index;
+}
+
 function readFileName (message, buffer, index) {
-	if (message.head.type === 2) {
+	if (message.head.code === 2 && message.head.type === 2) {
 		fileNameSize = buffer[index];
 		index++;
 		fileName = buffer.toString('utf8', index, index+ fileNameSize);
@@ -76,9 +107,9 @@ function readFileName (message, buffer, index) {
 
 function readTextContent (message, buffer, index) {
 	contentSize = buffer[index];
+	console.log('contentSize: ',contentSize);
 	index++;
-	bufferTemp = new Buffer(contentSize);
-	buffer.copy(bufferTemp, 0, index, contentSize);
+	bufferTemp = buffer.slice(index);
 	content = buffer.toString('utf8', index);
 	message.setContent(content);
 	index += contentSize;
@@ -95,11 +126,21 @@ function readFileContent (message, buffer, index) {
 	return index;
 }
 
-function writeType(type, buffer, index) {
-	typeBuffer = new Buffer(1);
-	typeBuffer.fill(type);
-	typeBuffer.copy(buffer, index);
+function writeCode(code, buffer, index) {
+	codeBuffer = new Buffer(1);
+	codeBuffer.fill(code);
+	codeBuffer.copy(buffer, index);
 	return index+1;
+}
+
+function writeType(type, buffer, index) {
+	if(type){
+		typeBuffer = new Buffer(1);
+		typeBuffer.fill(type);
+		typeBuffer.copy(buffer, index);
+		index++;
+	}
+	return index;
 }
 
 function writeRequestId(requestId, buffer, index) {
@@ -115,6 +156,18 @@ function writeRequestId(requestId, buffer, index) {
 	return index;
 }
 
+function writeDestinationId(destinationId, buffer, index) {
+	if(destinationId) {
+		writeDestinationIdSizeBuffer = new Buffer(1);
+		writeDestinationIdSizeBuffer[0] = destinationId.length;
+		writeDestinationIdSizeBuffer.copy(buffer, index, 0, 1);
+		index++;
+		destinationIdBuffer = new Buffer(destinationId);
+		destinationIdBuffer.copy(buffer, index, 0, destinationId.length);
+		index += destinationId.length;
+	} 
+	return index;
+}
 
 function writeFileName(fileName, buffer, index) {
 	if (fileName) {
@@ -135,6 +188,8 @@ function writeTextContent(content, buffer, index) {
 	contentSizeBuffer.copy(buffer,index);
 	index++;
 	contentBuffer = new Buffer(content);
+	console.log('buffer.size: ', buffer.length);
+	console.log('index: ', index);
 	contentBuffer.copy(buffer, index)
 	index += content.length;
 	return index + content.length;
@@ -147,18 +202,32 @@ function writeFileContent(content, buffer, index) {
 
 
 function getBufferSize (message) {
-	size = 1 /*type*/;
+	size = 1 /*code*/;
 	if (message.head.requestId) {
 		size += 1 /*requestId size*/ + message.head.requestId.length /*requestId*/;
+	}
+	if (message.head.destinationId) {
+		size += 1 /*requestId size*/ + message.head.destinationId.length /*requestId*/;
+	}
+	if (message.head.type) {
+		size += 1;
 	}
 	if (message.body.fileName){
 		size += 1 /*fileName size*/+ message.body.fileName.length;/*fileName*/
 	}
-	if(message.head.type < 2){
+
+
+
+	if(message.head.code == 1 || message.head.type == 1){
+
 		/*content size*/
-		size++
+		size++;
 	} 
-	size += message.body.content.length /*content*/;
+
+	if(message.head.code > 0) {
+		size += message.body.content.length /*content*/;
+	}
+
 	return size;
 }
 

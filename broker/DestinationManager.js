@@ -10,19 +10,19 @@ function DestinationManager () {
 }
 
 DestinationManager.prototype.add = function (destination) {
-	size += destinations[destination.getUuid()] ? 0 : 1;
-	destinations[destination.getUuid()] = destination;
-	console.log('Destination added with key:', destination.getUuid());
+	size += destinations[destination.getDestinationId()] ? 0 : 1;
+	destinations[destination.getDestinationId()] = destination;
+	console.log('Destination added with key:', destination.getDestinationId());
 	console.log('DestinationManager.count: ', size);
 }
 
 
 DestinationManager.prototype.remove = function (destination) {
-	destinations[destination.getUuid()] === null || (function() {
-		delete destinations[destination.getUuid()];
+	destinations[destination.getDestinationId()] === null || (function() {
+		delete destinations[destination.getDestinationId()];
 		size--;
 	}());
-	console.log('destination removed with key=', destination.getUuid());
+	console.log('destination removed with key=', destination.getDestinationId());
 	console.log('DestinationManager.count: ', size);
 }
 

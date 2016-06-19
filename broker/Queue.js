@@ -12,12 +12,17 @@ Queue.prototype.getDestinationUuid = function() {
 }
 
 Queue.prototype.enqueue = function(request) {
-	requests.push(requests);
+	console.log('Queue.enqueue: ', request);
+	requests.push(request);
 }
 
 
 Queue.prototype.dequeue = function() {
 	return requests.shift();
+}
+
+Queue.prototype.peek = function(){
+	return requests[0];
 }
 
 module.exports = Queue;
