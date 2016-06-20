@@ -1,49 +1,52 @@
 var net = require('net');
 var QueuesManager = require('./QueuesManager');
-var DestinationManager = require('./DestinationManager');
+var ResponderManager = require('./ResponderManager');
+var RequestorManager = require('./RequestorManager');
 //var MessageEncoder = require('./MessageEncoder');
 var Message = require('./../common/Message');
-var Destination = require('./Destination');
+var Responder = require('./Responder');
 var MessageBrokerEncoder = require('./MessageBrokerEncoder');
-
+var Requestor = require('../client/Requestor');
 
 //Constantes
 var HOST = '192.168.1.123';
 //var HOST = '192.168.43.197';
-var SERVER_PORT = 5678;
-var CLIENT_PORT = 5679;
+var RESPONDER_PORT = 5678;
+var REQUESTOR_PORT = 5679;
 
 //Atributos
 var client;
 var server;
+var requestorManager;
 var destinationManager;
 var queuesManager;
 
 function Broker() {
-	queuesManager = new QueuesManager();
-	destinationManager = new DestinationManager();
+	requestorManager = new RequestorManager();
+	responderManager = new ResponderManager();
+	queuesManager = new QueuesManager(requestorManager, responderManager);
 }
 
-Broker.prototype.startServerService = function () {
-	server = net.createServer(connectListener);
-	server.on('listening', function () {
-		address = server.address();
-		console.log('Started ServerService on %j', address);
+Broker.prototype.startResponderService = function () {
+	responder = net.createServer(connectResponderListener);
+	responder.on('listening', function () {
+		address = responder.address();
+		console.log('Started ResponderService on %j', address);
 	});
-  	server.on('error', errorListener);
-	server.listen(SERVER_PORT, HOST);
-	console.log('Starting Broker Server ...');
+  	responder.on('error', errorListener);
+	responder.listen(RESPONDER_PORT, HOST);
+	console.log('Starting Responder Server ...');
 }
 
-Broker.prototype.startClientService = function () {
-	client = net.createServer(connectClientListener);
-	client.on('listening', function(){
-		address = client.address();
-		console.log('Started ClientService on %j', address);	
+Broker.prototype.startRequestorService = function () {
+	requestor = net.createServer(connectRequestorListener);
+	requestor.on('listening', function(){
+		address = requestor.address();
+		console.log('Started RequestorService on %j', address);	
 	});
-  	client.on('error', errorListener);
-	client.listen(CLIENT_PORT, HOST);
-	console.log('Starting Broker Client Server ...');
+  	requestor.on('error', errorListener);
+	requestor.listen(REQUESTOR_PORT, HOST);
+	console.log('Starting Broker Requestor Server ...');
 }
 
 /*var listeningListener = function (_server) {
@@ -54,9 +57,9 @@ var errorListener = function (error) {
 	console.log(error);
 }
 
-var connectClientListener = function (socket) {
-	console.log('New Client: ' + socket.remoteAddress + ':' + socket.remotePort);
-	ClientConnection.createInstance(socket, queuesManager.getEmitter());
+var connectRequestorListener = function (socket) {
+	console.log('New Requestor: ' + socket.remoteAddress + ':' + socket.remotePort);
+	Requestor.createInstance(socket, eventCallback, queuesManager.getEmitter());
 }
 
 function onReceiveRequest (request) {
@@ -67,18 +70,26 @@ function onReceiveRequest (request) {
 
 }
 
-var connectListener = function (socket) {
-	console.log('New Server: ' + socket.remoteAddress + ':' + socket.remotePort);
-	Destination.createInstance(socket, eventCallback, queuesManager.getEmitter());
+var connectResponderListener = function (socket) {
+	console.log('New Server: ' + socket.remoteAddress + ':' + socket.remotePort);	
+	Responder.createInstance(socket, eventCallback, queuesManager.getEmitter());
 }
 
-function eventCallback(event, destination){
+var eventCallback = function(event, object){
+
+	var manager;
+	if( object instanceof Requestor) {
+		manager = requestorManager;
+	} else if (object instanceof Responder) {
+		manager = responderManager;
+	}
+
 	switch(event) {
 		case 'connect':
-		    destinationManager.add(destination);
+		    manager.add(object);
 			break;
 		case 'close':
-		    destinationManager.remove(destination);
+		    manager.remove(object);
 			break;
 	}
 }

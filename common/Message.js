@@ -16,7 +16,7 @@ Message.prototype.setCode = function (code) {
 }
 
 Message.prototype.setRequestorId = function (requestorId) {
-	if (typeof requestId === 'string') {
+	if (typeof requestorId === 'string') {
 		this.head.requestorId = requestorId;
 	} else {
 		throw new Error('tipo errado');
