@@ -13,7 +13,7 @@ var online;
 function QueuesManager(_requestorManager, _responderManager) {
 	responderManager = _responderManager;
 	requestorManager = _requestorManager;
-	
+
 	online = [];
 	requestQueues = [];
 	responseQueues = [];
@@ -65,14 +65,14 @@ function onEnqueueRequest(requestorId, responderId, request) {
 		console.log('criando uma nova fila para ', responderId);
 		queue = new Queue(responderId);
 		requestQueues.push(queue);
-	} 
+	}
 	queue.enqueue(request);
 	sendRequest(responderId);
 }
 
 function onResponderConnect(responderId) {
 	console.log('QueuesManager.onResponderConnect: ', responderId);
-	sendRequest(destinationId);
+	sendRequest(responderId);
 }
 
 function onRequestorConnect(requestorId) {
@@ -83,7 +83,7 @@ function onRequestorConnect(requestorId) {
 // function onResponderDisconnect(destinationId) {
 //     console.log('QueuesManager.onResponderDisconnect: ', destinationId);
 // }
- 
+
 
 function dequeueRequest(responderId) {
 	console.log('QueuesManager.dequeueRequest: ',responderId);
@@ -121,11 +121,12 @@ function sendRequest(responderId) {
 function sendResponse(requestorId) {
 	console.log('QueuesManager.sendResponse(): ', requestorId);
 	var queue = getResponseQueue(requestorId);
-	console.log('responseQueue: ', queue); 
+	console.log('responseQueue: ', queue);
 	if (queue){
 		response = queue.peek();
 		if (response) {
-			requestorManager.sendResponse(requestorId, response);
+		//requestorManager.sendResponse(requestorId, response);
+			emitter.emit(requestorId, response);
 			console.log('>>>>>>>>>>>: ', requestorId);
 		} else {
 			console.log('Sem response na fila de: ', requestorId);

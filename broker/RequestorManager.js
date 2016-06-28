@@ -35,6 +35,7 @@ RequestorManager.prototype.add = function (requestor) {
 }
 
 RequestorManager.prototype.remove = function (requestor) {
+	console.log('requestorId = ', requestor.getRequestorId());
 	requestors[requestor.getRequestorId()] === null || (function (){
 		delete requestors[requestor.getRequestorId()];
 		size--;

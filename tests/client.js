@@ -22,8 +22,8 @@ client.connect(PORT, HOST, function () {
 
   sendConnectionData();
 
-/************************************/ 
-  sendHourRequest();
+/************************************/
+  //sendHourRequest();
 
 /************************************/
 
@@ -45,7 +45,7 @@ function onResponse(data) {
     if(receiveDataCount > 0) {
       data = Buffer.concat([receiveDataBuffer, data]);
     }
-    
+
     message = MessageEncoder.decode(data);
     console.log('Response: ', message);
 

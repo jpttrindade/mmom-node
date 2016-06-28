@@ -22,12 +22,12 @@ client.connect(PORT, HOST, function () {
 
   sendConnectionData();
 
-/************************************/ 
+/************************************/
   //sendHourRequest();
 
 /************************************/
 
-  sendImageRequest();
+  //sendImageRequest();
 
 /************************************/
   //client.end();
@@ -45,7 +45,7 @@ function onResponse(data) {
     if(receiveDataCount > 0) {
       data = Buffer.concat([receiveDataBuffer, data]);
     }
-    
+
     message = MessageEncoder.decode(data);
     console.log('Response: ', message);
 
@@ -93,7 +93,7 @@ function sendImageRequest() {
   message.setRequestorId('requestor_2');
   message.setRequestId('request_2_2');
 //  message.setContent('get_image:9-passos-para-viver-em-Alta-Performance.pdf');
-  message.setContent('get_image:estante-debug.apk');
+  message.setContent('get_image:images.jpg');
 
   client.write(MessageEncoder.encode(message));
   console.log('image request sended');

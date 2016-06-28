@@ -42,7 +42,7 @@ Broker.prototype.startRequestorService = function () {
 	requestor = net.createServer(connectRequestorListener);
 	requestor.on('listening', function(){
 		address = requestor.address();
-		console.log('Started RequestorService on %j', address);	
+		console.log('Started RequestorService on %j', address);
 	});
   	requestor.on('error', errorListener);
 	requestor.listen(REQUESTOR_PORT, HOST);
@@ -50,7 +50,7 @@ Broker.prototype.startRequestorService = function () {
 }
 
 /*var listeningListener = function (_server) {
-	
+
 }*/
 
 var errorListener = function (error) {
@@ -71,12 +71,12 @@ function onReceiveRequest (request) {
 }
 
 var connectResponderListener = function (socket) {
-	console.log('New Server: ' + socket.remoteAddress + ':' + socket.remotePort);	
+	console.log('New Server: ' + socket.remoteAddress + ':' + socket.remotePort);
 	Responder.createInstance(socket, eventCallback, queuesManager.getEmitter());
 }
 
 var eventCallback = function(event, object){
-
+	console.log('>>', object);
 	var manager;
 	if( object instanceof Requestor) {
 		manager = requestorManager;
