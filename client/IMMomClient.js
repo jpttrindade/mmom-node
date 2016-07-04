@@ -42,6 +42,10 @@ function IMMomClient(_host, _port) {
     brokerConnection.request(data);
   }
 
+  this.closeConnection = function () {
+    brokerConnection.closeConnection();
+  }
+
   var onReceiveResponse = function (data) {
     var end = data.slice(data.length-2, data.length);
 
@@ -56,7 +60,7 @@ function IMMomClient(_host, _port) {
 
       var msg = MessageEncoder.decode(data);
       brokerEventCallback.emit('response', msg.head.requestId, msg.head.type, msg.body);
-      // 
+      //
       // if(message.head.type === 2) {
       //   console.log('Response size: ', data.length);
       //   console.log('message content size: ', message.body.content.length);

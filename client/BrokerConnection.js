@@ -22,6 +22,11 @@ function BrokerConnection(_host, _port) {
     });
   }
 
+  this.closeConnection = function () {
+    connection.destroy();
+    //eventCallback.emit('disconnected');
+  }
+
   this.request = function (data) {
     setImmediate(function () {
       connection.write(data);

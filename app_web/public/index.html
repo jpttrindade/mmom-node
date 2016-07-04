@@ -20,19 +20,29 @@
     <div class="container">
       <div class="page-header">
         <h1>MMOM Web Client </h1>
-        <p class="lead">Clint Nodejs to Mobile Message-Oriented Middleware</p>
+        <p class="lead">Client Nodejs to Mobile Message-Oriented Middleware</p>
       </div>
-
       <div class="row">
         <div class="col-md-4">
+        </div>
+        <div class="col-md-4">
+          <button id="bt_connect" onclick="bt_onclick()">Connect</button>
+        </div>
+        <div class="col-md-4">
+        </div>
+      </div>
+      <br>
+      <br>
+      <div class="row">
+        <div class="col-md-2">
           <button onclick="gethour()">Get Hour</button><br>
           <p id="hour"></p>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-5">
           <button onclick="getGps()">Get GPS</button><br>
           <p id="gps"></p>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-5">
           <button onclick="takepic()">Take Pic</button><br>
           <p id="pic_aviso"></p>
           <img id="pic" width="20%"></img>
@@ -41,6 +51,30 @@
 
       <script>
         var socket = io('http://localhost:3000');
+
+        function bt_onclick() {
+          var content = document.getElementById('bt_connect').innerHTML;
+          if (content === 'Connect') {
+            connectToBroker();
+          } else if (content === 'Disconnect') {
+            disconnectFromBroker();
+          }
+        }
+
+        function connectToBroker() {
+            socket.emit('connectToBroker');
+            socket.on('connected', function () {
+              document.getElementById('bt_connect').innerHTML = 'Disconnect';
+            });
+            socket.on('disconnected', function () {
+              document.getElementById('bt_connect').innerHTML = 'Connect';
+            });
+        }
+
+        function disconnectFromBroker() {
+          socket.emit('disconnectFromBroker');
+
+        }
 
         function gethour() {
           document.getElementById('hour').innerHTML = 'waiting...';

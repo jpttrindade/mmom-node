@@ -16,7 +16,7 @@ var REQUESTOR_ID = 'client_3';
 var REQUEST_ID = 1;
 var mSocket;
 
-var requests = {};
+var requests = JSON.parse(fs.readFileSync('requests.json', 'utf8'));
 
 var onReceiveResponse = function (requestId, type, body) {
   switch (type) {
@@ -25,6 +25,8 @@ var onReceiveResponse = function (requestId, type, body) {
         mSocket.emit('response_gethour', body.content);
       } else if (requests[requestId] === 'get_gps()') {
         mSocket.emit('response_getgps', body.content);
+      } else {
+        console.log("ops");
       }
       break;
     case 2:
@@ -34,16 +36,20 @@ var onReceiveResponse = function (requestId, type, body) {
     default:
 
   }
+  delete requests[requestId];
+  fs.writeFileSync('requests.json',  JSON.stringify(requests));
   console.log('onReceiveResponse', requestId + ' - ' + JSON.stringify(body));
 
 }
 
 var onConnectionEstablished = function () {
   console.log('onConnectionEstablished');
+  mSocket.emit('connected');
 }
 
 var onConnectionClosed = function () {
   console.log('onConnectionClosed');
+  mSocket.emit('disconnected');
 }
 
 
@@ -52,9 +58,9 @@ brokerEventCallback.on('response', onReceiveResponse);
 brokerEventCallback.on('connected', onConnectionEstablished);
 brokerEventCallback.on('disconnected', onConnectionClosed);
 
-mmomClient = new IMMomClient(HOST, PORT);
+var mmomClient = new IMMomClient(HOST, PORT);
 
-mmomClient.connect(REQUESTOR_ID, brokerEventCallback);
+//mmomClient.connect(REQUESTOR_ID, brokerEventCallback);
 
 app.listen(3000);
 
@@ -66,18 +72,33 @@ function handler(req, res) {
 
 io.on('connection', function (socket) {
   mSocket = socket;
+
+  socket.on('connectToBroker', function () {
+    mmomClient.connect(REQUESTOR_ID, brokerEventCallback);
+  });
+
+  socket.on('disconnectFromBroker', function () {
+    mmomClient.closeConnection();
+  });
+
   socket.on('gethour', function () {
     mmomClient.sendRequest('request_'+REQUEST_ID, 'RESPONDER_1','get_hour()');
+
     requests['request_'+REQUEST_ID] = 'get_hour()'
+    fs.writeFileSync('requests.json',  JSON.stringify(requests));
     REQUEST_ID++;
   });
   socket.on('getgps', function () {
     mmomClient.sendRequest('request_'+REQUEST_ID, 'RESPONDER_1', 'get_gps()');
     requests['request_'+REQUEST_ID] = 'get_gps()'
+    fs.writeFileSync('requests.json',  JSON.stringify(requests));
+
     REQUEST_ID++;
   })
   socket.on('takepic', function () {
     mmomClient.sendRequest('request_'+REQUEST_ID,'camera_1', 'get_image()');
+    requests['request_'+REQUEST_ID] = 'takepic'
+    fs.writeFileSync('requests.json',  JSON.stringify(requests));
     REQUEST_ID++;
   })
 });
