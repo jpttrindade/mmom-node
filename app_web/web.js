@@ -1,9 +1,11 @@
+var static = require('node-static');
+var IMMomClient = require('mmomclient');
+
 var app = require('http').createServer(handler)
 var io = require('socket.io')(app);
 var fs = require('fs');
-var IMMomClient = require('mmomclient');
 var EventEmitter = require('events').EventEmitter;
-var static = require('node-static');
+
 
 var fileServer = new static.Server('./public');
 
