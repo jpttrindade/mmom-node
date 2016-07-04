@@ -1,5 +1,5 @@
 var MessageBrokerEncoder = require('../broker/MessageBrokerEncoder');
-var MessageEncoder = require('./MessageEncoder');
+//var MessageEncoder = require('./MessageEncoder');
 
 function Requestor(_socket, _eventCallback, _emitter) {
 	var requestor = this;

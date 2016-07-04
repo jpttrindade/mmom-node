@@ -27,7 +27,7 @@ client.connect(PORT, HOST, function () {
 
 /************************************/
 
-  //sendImageRequest();
+  sendImageRequest();
 
 /************************************/
   //client.end();
@@ -78,7 +78,7 @@ function sendConnectionData() {
 function sendHourRequest() {
   var message = new Message();
   message.setCode(1);
-  message.setDestinationId('HOLA_QUE_TAL');
+  message.setDestinationId('RESPONDER_1');
   message.setRequestorId('requestor_1');
   message.setRequestId('request_1');
   message.setContent('get_hour()');
@@ -89,10 +89,11 @@ function sendHourRequest() {
 function sendImageRequest() {
   var message = new Message();
   message.setCode(1);
-  message.setDestinationId('HOLA_QUE_TAL');
+  message.setDestinationId('camera_1');
+  //message.setDestinationId('RESPONDER_1');
   message.setRequestorId('requestor_1');
   message.setRequestId('request_2');
-  message.setContent('get_image:imagens.jpg');
+  message.setContent('get_image:images.jpg');
   client.write(MessageEncoder.encode(message));
   console.log('image request sended');
 }

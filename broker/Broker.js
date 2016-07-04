@@ -3,10 +3,10 @@ var QueuesManager = require('./QueuesManager');
 var ResponderManager = require('./ResponderManager');
 var RequestorManager = require('./RequestorManager');
 //var MessageEncoder = require('./MessageEncoder');
-var Message = require('./../common/Message');
+var Message = require('./Message');
 var Responder = require('./Responder');
 var MessageBrokerEncoder = require('./MessageBrokerEncoder');
-var Requestor = require('../client/Requestor');
+var Requestor = require('./Requestor');
 
 //Constantes
 var HOST = '192.168.1.123';
@@ -18,7 +18,7 @@ var REQUESTOR_PORT = 5679;
 var client;
 var server;
 var requestorManager;
-var destinationManager;
+var responderManager;
 var queuesManager;
 
 function Broker() {

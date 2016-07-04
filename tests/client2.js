@@ -23,7 +23,7 @@ client.connect(PORT, HOST, function () {
   sendConnectionData();
 
 /************************************/
-  //sendHourRequest();
+  sendHourRequest();
 
 /************************************/
 
@@ -78,7 +78,7 @@ function sendConnectionData() {
 function sendHourRequest() {
   var message = new Message();
   message.setCode(1);
-  message.setDestinationId('HOLA_QUE_TAL');
+  message.setDestinationId('RESPONDER_1');
   message.setRequestorId('requestor_2');
   message.setRequestId('request_2_1');
   message.setContent('get_hour()');

@@ -1,4 +1,4 @@
-var Message = require('../common/Message');
+var Message = require('./Message');
 var Buffer =  require('buffer').Buffer;
 
 
@@ -10,7 +10,7 @@ MessageEncoder.encode = function (message) {
 	console.log('message: ', message);
 	var bufferSize = getBufferSize(message);
 	var buffer = new Buffer(bufferSize);
-	
+
 	index = writeCode(message.head.code, buffer, 0);
 	index = writeDestinationId(message.head.destinationId, buffer, index);
 	index = writeRequestorId(message.head.requestorId, buffer, index);
@@ -55,7 +55,7 @@ MessageEncoder.decode = function (buffer) {
 		} else {
 			index = readFileContent(message, buffer, index);
 		}
-	} 	
+	}
 
 	return message;
 }
@@ -180,7 +180,7 @@ function writeRequestId(requestId, buffer, index) {
 		requestIdBuffer = new Buffer(requestId);
 		requestIdBuffer.copy(buffer, index, 0, requestId.length);
 		index += requestId.length;
-	} 
+	}
 	return index;
 }
 
@@ -193,7 +193,7 @@ function writeDestinationId(destinationId, buffer, index) {
 		destinationIdBuffer = new Buffer(destinationId);
 		destinationIdBuffer.copy(buffer, index, 0, destinationId.length);
 		index += destinationId.length;
-	} 
+	}
 	return index;
 }
 
@@ -260,7 +260,7 @@ function getBufferSize (message) {
 
 		/*content size*/
 		size++;
-	} 
+	}
 
 	if(message.head.code > 0) {
 		size += message.body.content.length /*content*/;

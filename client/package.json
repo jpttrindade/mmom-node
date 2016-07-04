@@ -1,0 +1,11 @@
+{
+  "name": "mmomclient",
+  "version": "1.5.0",
+  "description": "client to MMOM.",
+  "main": "IMMomClient.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jpttrindade",
+  "license": "ISC"
+}
