@@ -13,7 +13,7 @@ RequestorManager.prototype.setQueuesManagerEmitter = function (_emitter) {
 }
 
 RequestorManager.prototype.sendResponse = function (requestorId, response) {
-	console.log("######### RequestorManager.sendResponse: ", requestorId)
+	//console.log("######### RequestorManager.sendResponse: ", requestorId)
 	if (requestors[requestorId]) {
 		requestors[requestorId].onReceiveResponse(response);
 	} else {
@@ -26,7 +26,7 @@ RequestorManager.prototype.add = function (requestor) {
 	size += requestors[requestor.getRequestorId()] ? 0 : 1;
 	requestors[requestor.getRequestorId()] = requestor;
 
-	console.log('xxxxxxxxxx: ',requestor.getRequestorId());
+	//console.log('xxxxxxxxxx: ',requestor.getRequestorId());
 	qmEmitter.on(requestor.getRequestorId(), requestor.onReceiveResponse);
 	qmEmitter.emit('requestor_connect', requestor.getRequestorId());
 

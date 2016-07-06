@@ -1,6 +1,4 @@
-
-
-var Socket = require('net').Socket;
+//var Socket = require('net').Socket;
 var destinations;
 var size;
 var qmEmitter;

@@ -9,11 +9,12 @@ var MessageBrokerEncoder = require('./MessageBrokerEncoder');
 var Requestor = require('./Requestor');
 
 //Constantes
-var HOST = '192.168.1.123';
+var HOST = '172.22.68.46';
 //var HOST = '192.168.43.197';
 var RESPONDER_PORT = 5678;
 var REQUESTOR_PORT = 5679;
 
+var host;
 //Atributos
 var client;
 var server;
@@ -21,31 +22,32 @@ var requestorManager;
 var responderManager;
 var queuesManager;
 
-function Broker() {
+function Broker(_host) {
+	host = _host;
 	requestorManager = new RequestorManager();
 	responderManager = new ResponderManager();
 	queuesManager = new QueuesManager(requestorManager, responderManager);
 }
 
-Broker.prototype.startResponderService = function () {
+Broker.prototype.startResponderService = function (responder_port) {
 	responder = net.createServer(connectResponderListener);
 	responder.on('listening', function () {
 		address = responder.address();
 		console.log('Started ResponderService on %j', address);
 	});
   	responder.on('error', errorListener);
-	responder.listen(RESPONDER_PORT, HOST);
+	responder.listen(responder_port, host);
 	console.log('Starting Responder Server ...');
 }
 
-Broker.prototype.startRequestorService = function () {
+Broker.prototype.startRequestorService = function (requestor_port) {
 	requestor = net.createServer(connectRequestorListener);
 	requestor.on('listening', function(){
 		address = requestor.address();
 		console.log('Started RequestorService on %j', address);
 	});
   	requestor.on('error', errorListener);
-	requestor.listen(REQUESTOR_PORT, HOST);
+	requestor.listen(requestor_port, host);
 	console.log('Starting Broker Requestor Server ...');
 }
 
@@ -60,14 +62,6 @@ var errorListener = function (error) {
 var connectRequestorListener = function (socket) {
 	console.log('New Requestor: ' + socket.remoteAddress + ':' + socket.remotePort);
 	Requestor.createInstance(socket, eventCallback, queuesManager.getEmitter());
-}
-
-function onReceiveRequest (request) {
-	console.log('onReceiveRequest');
-	var head = MessageBrokerEncoder.getHead(request);
-	console.log('head = ', head);
-	queuesManager.enqueueRequest(head.destinationId, request);
-
 }
 
 var connectResponderListener = function (socket) {

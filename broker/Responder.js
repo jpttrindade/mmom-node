@@ -1,5 +1,5 @@
 var MessageBrokerEncoder = require('./MessageBrokerEncoder');
-var MessageEncoder = require('../client/MessageEncoder');
+//var MessageEncoder = require('../client/MessageEncoder');
 
 // var socket;
 // var responderId;
