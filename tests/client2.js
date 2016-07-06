@@ -23,11 +23,11 @@ client.connect(PORT, HOST, function () {
   sendConnectionData();
 
 /************************************/
-  //sendHourRequest();
+  sendHourRequest();
 
 /************************************/
 
-  sendImageRequest();
+  //sendImageRequest();
 
 /************************************/
   //client.end();
@@ -70,7 +70,7 @@ function onResponse(data) {
 function sendConnectionData() {
   var message = new Message();
   message.setCode(0);
-  message.setDestinationId('requestor_1');
+  message.setDestinationId('requestor_2');
   client.write(MessageEncoder.encode(message));
   console.log('connection code sended');
 }
@@ -79,8 +79,8 @@ function sendHourRequest() {
   var message = new Message();
   message.setCode(1);
   message.setDestinationId('RESPONDER_1');
-  message.setRequestorId('requestor_1');
-  message.setRequestId('request_1');
+  message.setRequestorId('requestor_2');
+  message.setRequestId('request_2_1');
   message.setContent('get_hour()');
   client.write(MessageEncoder.encode(message));
   console.log('hour request sended');
@@ -89,11 +89,12 @@ function sendHourRequest() {
 function sendImageRequest() {
   var message = new Message();
   message.setCode(1);
-  message.setDestinationId('camera_1');
-  //message.setDestinationId('RESPONDER_1');
-  message.setRequestorId('requestor_1');
-  message.setRequestId('request_2');
+  message.setDestinationId('HOLA_QUE_TAL');
+  message.setRequestorId('requestor_2');
+  message.setRequestId('request_2_2');
+//  message.setContent('get_image:9-passos-para-viver-em-Alta-Performance.pdf');
   message.setContent('get_image:images.jpg');
+
   client.write(MessageEncoder.encode(message));
   console.log('image request sended');
 }
