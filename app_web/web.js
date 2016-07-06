@@ -9,7 +9,7 @@ var EventEmitter = require('events').EventEmitter;
 
 var fileServer = new static.Server('./public');
 
-var HOST = '192.168.1.123';
+var HOST = '172.22.68.46';
 var PORT = 5679;
 
 var REQUESTOR_ID = 'client_3';

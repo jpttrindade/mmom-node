@@ -1,0 +1,14 @@
+{
+  "name": "mmomclientweb",
+  "version": "1.0.0",
+  "description": "client web to mmom",
+  "main": "web.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jpttrindade",
+  "license": "ISC",
+  "dependencies": {
+    "mmomclient": "^1.7.1"
+  }
+}
